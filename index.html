@@ -109,6 +109,7 @@
   <div id="controls">
     <button id="modoBtn">Cambiar a Modo Práctica</button>
     <button id="editBtn">Cambiar a Modo Edición</button>
+    <button id="exportBtn">💾 Exportar coordenadas</button>
   </div>
 
   <div id="container">
@@ -121,60 +122,60 @@
     let modo = "consulta";
     let edicion = true;
     let planaActual = "estomago";
+    let coordenadasGuardadas = {};
 
+    // 🧠 Estructuras anatómicas
     const estructuras = {
       "estomago": {
-        1:"Hígado", 2:"Hígado, área desnuda", 3:"Hígado, cara diafragmática",
-        4:"Hígado, cara visceral", 5:"Hígado, impresión del colon",
-        6:"Hígado, impresión del duodeno", 7:"Hígado, impresión del estómago",
-        8:"Hígado, impresión del esófago", 9:"Hígado, impresión del riñón",
-        10:"Hígado, lóbulo caudado", 11:"Hígado, lóbulo derecho",
-        12:"Hígado, lóbulo cuadrado", 13:"Hígado, lóbulo izquierdo",
-        14:"Hígado, borde inferior", 15:"Hígado, proceso caudado",
-        16:"A. hepática común", 17:"Conducto hepático derecho",
-        18:"Conducto hepático izquierdo", 19:"V. cava inferior",
-        20:"Vv. hepáticas", 21:"Lig. redondo del hígado",
-        22:"Lig. falciforme", 23:"Vesícula biliar, cuello",
-        24:"Vesícula biliar, cuerpo", 25:"Vesícula biliar, fondo",
-        26:"Conducto cístico", 27:"Conducto colédoco",
-        28:"V. porta hepática",
-        a:"A. gástrica derecha", b:"Píloro"
+        1:"Hígado",2:"Hígado, área desnuda",3:"Hígado, cara diafragmática",4:"Hígado, cara visceral",
+        5:"Hígado, impresión del colon",6:"Hígado, impresión del duodeno",7:"Hígado, impresión del estómago",
+        8:"Hígado, impresión del esófago",9:"Hígado, impresión del riñón",10:"Hígado, lóbulo caudado",
+        11:"Hígado, lóbulo derecho",12:"Hígado, lóbulo cuadrado",13:"Hígado, lóbulo izquierdo",
+        14:"Hígado, borde inferior",15:"Hígado, proceso caudado",16:"A. hepática común",17:"Conducto hepático derecho",
+        18:"Conducto hepático izquierdo",19:"V. cava inferior",20:"Vv. hepáticas",21:"Lig. redondo del hígado",
+        22:"Lig. falciforme",23:"Vesícula biliar, cuello",24:"Vesícula biliar, cuerpo",25:"Vesícula biliar, fondo",
+        26:"Conducto cístico",27:"Conducto colédoco",28:"V. porta hepática",a:"A. gástrica derecha",b:"Píloro"
       },
       "ABDOMEN": {
-        1:"Colon ascendente", 2:"Colon descendente", 3:"Colon sigmoide",
-        4:"Colon transverso", 5:"Colon, haustra", 6:"Colon, plica semilunar",
-        7:"Válvula del orificio ileocecal", 8:"Íleon", 9:"Yeyuno",
-        10:"Apéndice vermiforme", 11:"Apéndice vermiforme, orificio",
-        12:"Omento mayor", 13:"Válvula ileocecal", 14:"Tenia libre",
-        15:"Ángulo derecho del colon", 16:"Ángulo izquierdo del colon",
-        17:"Recto, ángulo sacro", 18:"Peritoneo visceral", 19:"Duodeno, ángulo inferior",
-        20:"Duodeno, ángulo superior", 21:"Duodeno, porción ascendente",
-        22:"Duodeno, porción descendente", 23:"Duodeno, porción horizontal",
-        24:"Páncreas, cabeza", 25:"Páncreas, cola", 26:"Páncreas, cuerpo",
-        27:"Conducto colédoco", 28:"A. y v. esplénicas", 29:"Conducto pancreático",
-        30:"Ciego"
+        1:"Colon ascendente",2:"Colon descendente",3:"Colon sigmoide",4:"Colon transverso",5:"Colon, haustra",
+        6:"Colon, plica semilunar",7:"Válvula del orificio ileocecal",8:"Íleon",9:"Yeyuno",10:"Apéndice vermiforme",
+        11:"Apéndice vermiforme, orificio",12:"Omento mayor",13:"Válvula ileocecal",14:"Tenia libre",
+        15:"Ángulo derecho del colon",16:"Ángulo izquierdo del colon",17:"Recto, ángulo sacro",18:"Peritoneo visceral",
+        19:"Duodeno, ángulo inferior",20:"Duodeno, ángulo superior",21:"Duodeno, porción ascendente",
+        22:"Duodeno, porción descendente",23:"Duodeno, porción horizontal",24:"Páncreas, cabeza",
+        25:"Páncreas, cola",26:"Páncreas, cuerpo",27:"Conducto colédoco",28:"A. y v. esplénicas",
+        29:"Conducto pancreático",30:"Ciego"
       },
       "INTESTINOS": {
-        1:"Conducto pancreático", 2:"Colon ascendente", 3:"Colon descendente",
-        4:"Colon sigmoide", 5:"Colon transverso", 6:"Colon, haustra",
-        7:"Válvula del orificio ileocecal", 8:"Válvula ileocecal", 9:"Páncreas, cabeza",
-        10:"Páncreas, cola", 11:"Páncreas, cuerpo", 12:"Páncreas",
-        13:"Duodeno", 14:"Duodeno, ángulo inferior", 15:"Duodeno, ángulo superior",
-        16:"Duodeno, porción ascendente", 17:"Duodeno, porción descendente",
-        18:"Conducto colédoco", 19:"A. y v. esplénicas", 20:"Apéndice vermiforme",
-        21:"Apéndice vermiforme, orificio", 22:"Ciego", 23:"Tenia libre",
-        24:"Íleon", 25:"Yeyuno", 26:"Conducto pancreático accesorio (Santorini)",
-        27:"A. y v. mesentéricas superiores", 28:"A. y V. mesentérica inferior",
-        29:"Aa. y Vv. yeyunales e ileales", 30:"A. y V. cólica derecha",
-        31:"A. y V. cólica media", 32:"A. y V. cólica izquierda",
-        33:"Aa. y Vv. sigmoideas", 34:"A. rectal superior", 35:"Mesocolon transverso"
+        1:"Conducto pancreático",2:"Colon ascendente",3:"Colon descendente",4:"Colon sigmoide",5:"Colon transverso",
+        6:"Colon, haustra",7:"Válvula del orificio ileocecal",8:"Válvula ileocecal",9:"Páncreas, cabeza",
+        10:"Páncreas, cola",11:"Páncreas, cuerpo",12:"Páncreas",13:"Duodeno",14:"Duodeno, ángulo inferior",
+        15:"Duodeno, ángulo superior",16:"Duodeno, porción ascendente",17:"Duodeno, porción descendente",
+        18:"Conducto colédoco",19:"A. y v. esplénicas",20:"Apéndice vermiforme",21:"Apéndice vermiforme, orificio",
+        22:"Ciego",23:"Tenia libre",24:"Íleon",25:"Yeyuno",26:"Conducto pancreático accesorio (Santorini)",
+        27:"A. y v. mesentéricas superiores",28:"A. y V. mesentérica inferior",29:"Aa. y Vv. yeyunales e ileales",
+        30:"A. y V. cólica derecha",31:"A. y V. cólica media",32:"A. y V. cólica izquierda",
+        33:"Aa. y Vv. sigmoideas",34:"A. rectal superior",35:"Mesocolon transverso"
       }
     };
 
     const container = document.getElementById("container");
     const infoBox = document.getElementById("infoBox");
 
-    // Generar puntos iniciales
+    // 🟡 Cargar coordenadas guardadas
+    fetch("coordenadas_por_plana.json")
+      .then(r => r.json())
+      .then(data => {
+        coordenadasGuardadas = data;
+        console.log("✅ Coordenadas cargadas:", data);
+        generarHotspots();
+      })
+      .catch(() => {
+        console.warn("⚠️ No se encontró coordenadas_por_plana.json, usando posiciones aleatorias.");
+        generarHotspots();
+      });
+
+    // 🧩 Generar hotspots
     function generarHotspots() {
       container.querySelectorAll(".hotspot").forEach(e => e.remove());
       const lista = estructuras[planaActual];
@@ -183,23 +184,28 @@
         hs.className = "hotspot";
         hs.dataset.numero = n;
         hs.textContent = n;
-        hs.style.top = Math.random() * 90 + "%";
-        hs.style.left = Math.random() * 90 + "%";
+
+        const coords = coordenadasGuardadas?.[planaActual]?.[`hotspot_${n}`];
+        if (coords) {
+          hs.style.top = coords.top;
+          hs.style.left = coords.left;
+        } else {
+          hs.style.top = Math.random() * 90 + "%";
+          hs.style.left = Math.random() * 90 + "%";
+        }
+
         if (!edicion) hs.classList.add("hidden");
+
         hs.addEventListener("click", () => {
           if (edicion) return;
           const nombre = lista[n] || "No asignado";
-          if (modo === "consulta") {
-            infoBox.innerText = `${n}: ${nombre}`;
-          } else {
+          if (modo === "consulta") infoBox.innerText = `${n}: ${nombre}`;
+          else {
             const r = prompt(`Introduce el nombre para el número ${n}:`);
-            if (r) {
-              if (normalizar(r) === normalizar(nombre))
-                alert(`✅ Correcto: ${nombre}`);
-              else alert(`❌ Incorrecto. Correcto: ${nombre}`);
-            }
+            if (r) alert(normalizar(r) === normalizar(nombre) ? `✅ Correcto: ${nombre}` : `❌ Incorrecto. Correcto: ${nombre}`);
           }
         });
+
         hs.addEventListener("mousedown", e => {
           if (!edicion) return;
           const rect = container.getBoundingClientRect();
@@ -210,22 +216,22 @@
             hs.style.top = y + "%";
           }
           function up() {
+            localStorage.setItem(`hotspot_${planaActual}_${n}`, JSON.stringify({top: hs.style.top, left: hs.style.left}));
             document.removeEventListener("mousemove", move);
             document.removeEventListener("mouseup", up);
           }
           document.addEventListener("mousemove", move);
           document.addEventListener("mouseup", up);
         });
+
         container.appendChild(hs);
       }
     }
 
-    // Normalizar texto
     function normalizar(txt) {
       return txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\.,;:]/g, "");
     }
 
-    // Cambiar modo
     document.getElementById("modoBtn").onclick = () => {
       modo = (modo === "consulta") ? "practica" : "consulta";
       infoBox.innerText = (modo === "consulta")
@@ -233,16 +239,12 @@
         : "Modo Práctica: haz clic en un número e ingresa la respuesta.";
     };
 
-    // Cambiar edición
     document.getElementById("editBtn").onclick = () => {
       edicion = !edicion;
-      document.querySelectorAll(".hotspot").forEach(h => {
-        if (edicion) h.classList.remove("hidden");
-        else h.classList.add("hidden");
-      });
+      document.querySelectorAll(".hotspot").forEach(h => h.classList.toggle("hidden", !edicion));
     };
 
-    // Cambiar plana
+    // 🔄 Cambiar plana
     document.querySelectorAll("#menu button").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll("#menu button").forEach(b => b.classList.remove("active"));
@@ -253,7 +255,21 @@
       });
     });
 
-    generarHotspots();
+    // 💾 Exportar coordenadas
+    document.getElementById("exportBtn").onclick = () => {
+      const data = {};
+      document.querySelectorAll(".hotspot").forEach(hs => {
+        const n = hs.dataset.numero;
+        if (!data[planaActual]) data[planaActual] = {};
+        data[planaActual][`hotspot_${n}`] = {top: hs.style.top, left: hs.style.left};
+      });
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "coordenadas_actualizadas.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
   </script>
 </body>
 </html>
