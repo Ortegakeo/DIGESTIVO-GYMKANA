@@ -120,11 +120,9 @@
 
   <script>
     let modo = "consulta";
-    let edicion = true;
+    let edicion = false; // Inicia oculto
     let planaActual = "estomago";
-    let coordenadasGuardadas = {};
 
-    // 🧠 Estructuras anatómicas
     const estructuras = {
       "estomago": {
         1:"Hígado",2:"Hígado, área desnuda",3:"Hígado, cara diafragmática",4:"Hígado, cara visceral",
@@ -134,7 +132,7 @@
         14:"Hígado, borde inferior",15:"Hígado, proceso caudado",16:"A. hepática común",17:"Conducto hepático derecho",
         18:"Conducto hepático izquierdo",19:"V. cava inferior",20:"Vv. hepáticas",21:"Lig. redondo del hígado",
         22:"Lig. falciforme",23:"Vesícula biliar, cuello",24:"Vesícula biliar, cuerpo",25:"Vesícula biliar, fondo",
-        26:"Conducto cístico",27:"Conducto colédoco",28:"V. porta hepática",a:"A. gástrica derecha",b:"Píloro"
+        26:"Conducto cístico",27:"Conducto colédoco",28:"V. porta hepática"
       },
       "ABDOMEN": {
         1:"Colon ascendente",2:"Colon descendente",3:"Colon sigmoide",4:"Colon transverso",5:"Colon, haustra",
@@ -159,43 +157,25 @@
       }
     };
 
+    const coordenadasIntegradas = { "INTESTINOS": {"hotspot_1":{"top":"18.4408%","left":"69.1442%"} } };
+
+    // Cargar coordenadas
+    let coordenadasGuardadas = JSON.parse(localStorage.getItem("coordenadas_por_plana")) || coordenadasIntegradas;
+
     const container = document.getElementById("container");
     const infoBox = document.getElementById("infoBox");
 
-    // 🟡 Cargar coordenadas guardadas
-    fetch("coordenadas_por_plana.json")
-      .then(r => r.json())
-      .then(data => {
-        coordenadasGuardadas = data;
-        console.log("✅ Coordenadas cargadas:", data);
-        generarHotspots();
-      })
-      .catch(() => {
-        console.warn("⚠️ No se encontró coordenadas_por_plana.json, usando posiciones aleatorias.");
-        generarHotspots();
-      });
-
-    // 🧩 Generar hotspots
     function generarHotspots() {
       container.querySelectorAll(".hotspot").forEach(e => e.remove());
       const lista = estructuras[planaActual];
+      const coords = coordenadasGuardadas[planaActual] || {};
       for (let n in lista) {
         const hs = document.createElement("div");
-        hs.className = "hotspot";
+        hs.className = "hotspot hidden";
         hs.dataset.numero = n;
         hs.textContent = n;
-
-        const coords = coordenadasGuardadas?.[planaActual]?.[`hotspot_${n}`];
-        if (coords) {
-          hs.style.top = coords.top;
-          hs.style.left = coords.left;
-        } else {
-          hs.style.top = Math.random() * 90 + "%";
-          hs.style.left = Math.random() * 90 + "%";
-        }
-
-        if (!edicion) hs.classList.add("hidden");
-
+        hs.style.top = coords[`hotspot_${n}`]?.top || Math.random() * 90 + "%";
+        hs.style.left = coords[`hotspot_${n}`]?.left || Math.random() * 90 + "%";
         hs.addEventListener("click", () => {
           if (edicion) return;
           const nombre = lista[n] || "No asignado";
@@ -205,31 +185,12 @@
             if (r) alert(normalizar(r) === normalizar(nombre) ? `✅ Correcto: ${nombre}` : `❌ Incorrecto. Correcto: ${nombre}`);
           }
         });
-
-        hs.addEventListener("mousedown", e => {
-          if (!edicion) return;
-          const rect = container.getBoundingClientRect();
-          function move(ev) {
-            const x = (ev.clientX - rect.left) / rect.width * 100;
-            const y = (ev.clientY - rect.top) / rect.height * 100;
-            hs.style.left = x + "%";
-            hs.style.top = y + "%";
-          }
-          function up() {
-            localStorage.setItem(`hotspot_${planaActual}_${n}`, JSON.stringify({top: hs.style.top, left: hs.style.left}));
-            document.removeEventListener("mousemove", move);
-            document.removeEventListener("mouseup", up);
-          }
-          document.addEventListener("mousemove", move);
-          document.addEventListener("mouseup", up);
-        });
-
         container.appendChild(hs);
       }
     }
 
     function normalizar(txt) {
-      return txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\.,;:]/g, "");
+      return txt.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[\.,;:]/g, "");
     }
 
     document.getElementById("modoBtn").onclick = () => {
@@ -244,7 +205,6 @@
       document.querySelectorAll(".hotspot").forEach(h => h.classList.toggle("hidden", !edicion));
     };
 
-    // 🔄 Cambiar plana
     document.querySelectorAll("#menu button").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll("#menu button").forEach(b => b.classList.remove("active"));
@@ -255,21 +215,16 @@
       });
     });
 
-    // 💾 Exportar coordenadas
     document.getElementById("exportBtn").onclick = () => {
-      const data = {};
-      document.querySelectorAll(".hotspot").forEach(hs => {
-        const n = hs.dataset.numero;
-        if (!data[planaActual]) data[planaActual] = {};
-        data[planaActual][`hotspot_${n}`] = {top: hs.style.top, left: hs.style.left};
-      });
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+      const blob = new Blob([JSON.stringify(coordenadasGuardadas, null, 2)], {type: "application/json"});
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = "coordenadas_actualizadas.json";
       a.click();
       URL.revokeObjectURL(a.href);
     };
+
+    generarHotspots();
   </script>
 </body>
 </html>
