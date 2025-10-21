@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Torso 3B Interactivo - Aparato Digestivo</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; }
+    #container { position: relative; display: inline-block; }
+    #torso { max-width: 100%; height: auto; }
+    .hotspot {
+      position: absolute; width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255, 0, 0, 0.75); color: white; font-size: 14px;
+      font-weight: bold; display: flex; align-items: center; justify-content: center;
+      cursor: grab; user-select: none;
+    }
+    #infoBox {
+      position: absolute; top: 20px; right: 20px; width: 340px; padding: 15px;
+      background: white; border: 2px solid #0078D7; border-radius: 10px;
+      font-size: 16px; font-weight: bold; cursor: move; z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Modelo 3B Interactivo - Hígado, Estómago e Intestinos</h1>
+
+  <div id="container">
+    <img id="torso" src="torso.jpg" alt="Torso Digestivo 3B">
+
+    <script>
+      for (let i = 1; i <= 95; i++) {
+        let side, top;
+        if (i <= 50) { side = "left:2%;"; top = (i * 2) + "%"; }
+        else { side = "right:2%;"; top = ((i - 50) * 2) + "%"; }
+        document.write(`<div class="hotspot" style="top:${top}; ${side}" data-numero="${i}">${i}</div>`);
+      }
+    </script>
+  </div>
+
+  <div id="infoBox">Haz clic en un número para ver la estructura.</div>
+
+  <script>
+    // 🧠 Estructuras anatómicas del PDF "PRUEBA ANATO HOY PRÁCTICA"
+    const estructuras = {
+      // 🩸 PLANA 1 – HÍGADO
+      1:"Hígado",
+      2:"Hígado, área desnuda",
+      3:"Hígado, cara diafragmática",
+      4:"Hígado, cara visceral",
+      5:"Hígado, impresión del colon",
+      6:"Hígado, impresión del duodeno",
+      7:"Hígado, impresión del estómago",
+      8:"Hígado, impresión del esófago",
+      9:"Hígado, impresión del riñón",
+      10:"Hígado, lóbulo caudado",
+      11:"Hígado, lóbulo derecho",
+      12:"Hígado, lóbulo cuadrado",
+      13:"Hígado, lóbulo izquierdo",
+      14:"Hígado, borde inferior",
+      15:"Hígado, proceso caudado",
+      16:"Arteria hepática común",
+      17:"Conducto hepático derecho",
+      18:"Conducto hepático izquierdo",
+      19:"Vena cava inferior",
+      20:"Venas hepáticas",
+      21:"Ligamento redondo del hígado",
+      22:"Ligamento falciforme",
+      23:"Vesícula biliar, cuello",
+      24:"Vesícula biliar, cuerpo",
+      25:"Vesícula biliar, fondo",
+      26:"Conducto cístico",
+      27:"Conducto colédoco",
+      28:"Vena porta hepática",
+
+      // 🧠 PLANA 2 – ESTÓMAGO
+      29:"Arteria gástrica derecha",
+      30:"Arteria gástrica izquierda",
+      31:"Arterias gástricas cortas",
+      32:"Arteria gastroepiploica derecha",
+      33:"Arteria gastroepiploica izquierda",
+      34:"Omento (epiplón) mayor",
+      35:"Estómago, curvatura mayor",
+      36:"Estómago, curvatura menor",
+      37:"Escotadura angular",
+      38:"Escotadura cardíaca",
+      39:"Cardias",
+      40:"Cuerpo del estómago",
+      41:"Fundus",
+      42:"Esófago, porción abdominal",
+      43:"Píloro",
+
+      // 🦠 PLANA 3 – INTESTINO ENTERO
+      44:"Colon ascendente",
+      45:"Colon descendente",
+      46:"Colon sigmoide",
+      47:"Colon transverso",
+      48:"Colon, haustras",
+      49:"Colon, plica semilunar",
+      50:"Válvula del orificio ileocecal",
+      51:"Íleon",
+      52:"Yeyuno",
+      53:"Apéndice vermiforme",
+      54:"Orificio del apéndice vermiforme",
+      55:"Omento mayor",
+      56:"Válvula ileocecal",
+      57:"Tenia libre",
+      58:"Ángulo derecho del colon",
+      59:"Ángulo izquierdo del colon",
+      60:"Recto, ángulo sacro",
+      61:"Peritoneo visceral",
+      62:"Duodeno, ángulo inferior",
+      63:"Duodeno, ángulo superior",
+      64:"Duodeno, porción ascendente",
+      65:"Duodeno, porción descendente",
+      66:"Duodeno, porción horizontal",
+      67:"Páncreas, cabeza",
+      68:"Páncreas, cola",
+      69:"Páncreas, cuerpo",
+      70:"Conducto colédoco",
+      71:"Arteria y vena esplénicas",
+      72:"Conducto pancreático",
+      73:"Ciego",
+
+      // 🧫 PLANA 4 – INTESTINO DELGADO Y GRUESO
+      74:"Conducto pancreático",
+      75:"Colon ascendente",
+      76:"Colon descendente",
+      77:"Colon sigmoide",
+      78:"Colon transverso",
+      79:"Colon, haustra",
+      80:"Válvula del orificio ileocecal",
+      81:"Válvula ileocecal",
+      82:"Páncreas, cabeza",
+      83:"Páncreas, cola",
+      84:"Páncreas, cuerpo",
+      85:"Páncreas",
+      86:"Duodeno",
+      87:"Duodeno, ángulo inferior",
+      88:"Duodeno, ángulo superior",
+      89:"Duodeno, porción ascendente",
+      90:"Duodeno, porción descendente",
+      91:"Conducto colédoco",
+      92:"Arteria y vena esplénicas (lienales)",
+      93:"Apéndice vermiforme",
+      94:"Orificio del apéndice vermiforme",
+      95:"Ciego",
+      "a":"Tenia libre",
+      "b":"Mesocolon transverso"
+    };
+
+    // Evento de clic
+    document.querySelectorAll('.hotspot').forEach(hs => {
+      hs.addEventListener('click', () => {
+        const n = hs.dataset.numero;
+        const nombre = estructuras[n] || "No asignado";
+        document.getElementById("infoBox").innerText = `${n}: ${nombre}`;
+      });
+    });
+  </script>
+</body>
+</html>
