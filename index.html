@@ -1,441 +1,259 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Digestivo 3B Interactivo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Modelo 3B Interactivo – Aparato Digestivo (UCM Bioingeniería Médica)</title>
   <style>
-    :root{
-      --ucm-blue:#0078D7;
-      --ucm-dark:#004e92;
-      --ucm-gray:#f3f5f7;
-      --ok:#19a974;
-      --bad:#e11d48;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      text-align: center;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Arial, Helvetica, sans-serif; background:#fafafa; color:#222;
+    h1 {
+      background: #004c91;
+      color: white;
+      padding: 15px;
+      margin: 0;
     }
-    header{
-      padding:14px 16px; background:linear-gradient(90deg, var(--ucm-dark), var(--ucm-blue));
-      color:#fff; text-align:center;
+    #menu {
+      background: #0078D7;
+      padding: 10px;
     }
-    h1{margin:0 0 8px 0; font-size:22px; letter-spacing:.3px}
-    .toolbar{
-      display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center;
-      padding:12px; background:#fff; border-bottom:1px solid #e5e7eb;
+    #menu button {
+      background: white;
+      color: #0078D7;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
     }
-    .toolbar select, .toolbar button{
-      padding:8px 12px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer;
-      font-size:14px;
+    #menu button.active {
+      background: #005a9e;
+      color: white;
     }
-    .toolbar button{
-      background:var(--ucm-blue); color:#fff; border:none; box-shadow:0 1px 0 rgba(0,0,0,.08);
+    #controls {
+      margin: 15px 0;
     }
-    .toolbar button.secondary{ background:#fff; color:#111; border:1px solid #d1d5db; }
-    .toolbar button:hover{ filter:brightness(.95); }
-    .wrap{
-      display:flex; flex-direction:column; align-items:center; gap:12px; padding:16px;
+    button {
+      background: #0078D7;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
     }
-    #container{
-      position:relative; display:inline-block; max-width:1200px; width:95%;
-      background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px;
-      box-shadow:0 6px 24px rgba(0,0,0,.06);
+    button:hover { background: #005a9e; }
+    #container {
+      position: relative;
+      display: inline-block;
+      max-width: 90%;
     }
-    #imgWrap{ position:relative; width:100%; }
-    #torso{
-      width:100%; height:auto; border-radius:8px; display:block; user-select:none;
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 3px solid #ccc;
+      background: white;
     }
-    .hotspot{
-      position:absolute; width:32px; height:32px; border-radius:50%;
-      background:rgba(255,0,0,.8); color:#fff; font-weight:700; font-size:14px;
-      display:flex; align-items:center; justify-content:center; user-select:none;
-      cursor:grab; transform:translate(-50%, -50%); transition:transform .15s ease, opacity .15s ease;
+    .hotspot {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.8);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
     }
-    .hotspot:active{ cursor:grabbing; transform:translate(-50%, -50%) scale(1.05); }
-    .invisible{ opacity:0; pointer-events:auto; } /* invisibles pero clickeables */
-    .hidden{ display:none; }
-
-    #infoBox{
-      position:fixed; right:16px; bottom:16px; width:360px; max-width:92vw;
-      background:#fff; border:2px solid var(--ucm-blue); border-radius:12px; padding:12px;
-      font-weight:700; box-shadow:0 8px 30px rgba(0,0,0,.12);
+    .hidden {
+      background: transparent !important;
+      color: transparent !important;
+      border: none !important;
+      cursor: pointer;
     }
-    #log{
-      width:100%; max-width:1200px; background:#fff; border:1px solid #e5e7eb;
-      border-radius:12px; overflow:auto;
-    }
-    table{ width:100%; border-collapse:collapse; font-size:14px; }
-    th, td{ border-bottom:1px solid #eef2f7; padding:8px 10px; text-align:left; }
-    th{ background:var(--ucm-gray); }
-    .tag{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; }
-    .ok{ background:#e8fff5; color:var(--ok); border:1px solid #b5f2d7; }
-    .bad{ background:#ffeaf0; color:var(--bad); border:1px solid #ffc0d1; }
-    .muted{ color:#6b7280; font-weight:400; }
-    .note{ font-size:12px; color:#6b7280; }
-    .flex-gap{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-    input[type="file"]{ display:none; }
-    @media (max-width:768px){
-      #infoBox{ position:static; width:calc(100% - 32px); margin:0 16px 16px; }
-      header{ text-align:center; }
+    #infoBox {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 2px solid #0078D7;
+      border-radius: 10px;
+      padding: 10px;
+      width: 320px;
+      font-weight: bold;
+      color: #004c91;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Modelo 3B Interactivo – Aparato Digestivo</h1>
-    <div class="note">Planas separadas, numeración propia por imagen. Edita posiciones una vez y quedan guardadas.</div>
-  </header>
+  <h1>Modelo 3B Interactivo – Aparato Digestivo (UCM Bioingeniería Médica)</h1>
 
-  <div class="toolbar">
-    <label>Plana:&nbsp;
-      <select id="planaSel">
-        <option value="ABDOMEN.jpg">🫀 Hígado / Abdomen</option>
-        <option value="estomago.jpg">🍽️ Estómago</option>
-        <option value="INTESTINOS.jpg">🧫 Intestinos</option>
-      </select>
-    </label>
-
-    <div class="flex-gap">
-      <button id="modoEdicion">Modo Edición</button>
-      <button class="secondary" id="modoConsulta">Modo Consulta</button>
-      <button class="secondary" id="modoPractica">Modo Práctica</button>
-    </div>
-
-    <div class="flex-gap">
-      <button class="secondary" id="exportBtn">Exportar posiciones</button>
-      <label for="importFile" class="secondary" style="padding:8px 12px;">Importar posiciones</label>
-      <input type="file" id="importFile" accept="application/json" />
-      <button class="secondary" id="resetBtn">Reset locales</button>
-    </div>
+  <div id="menu">
+    <button class="active" data-plana="estomago">Hígado y Estómago</button>
+    <button data-plana="ABDOMEN">Intestino entero</button>
+    <button data-plana="INTESTINOS">Intestino delgado y grueso</button>
   </div>
 
-  <div class="wrap">
-    <div id="container">
-      <div id="imgWrap">
-        <img id="torso" src="ABDOMEN.jpg" alt="ABDOMEN (Hígado)">
-        <!-- hotspots se inyectan por JS -->
-      </div>
-    </div>
-
-    <div id="infoBox">Modo: <span id="modeLabel">Edición</span> — haz clic en un número (o arrástralo en Edición).</div>
-
-    <div id="log">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Tu respuesta</th>
-            <th>Correcto</th>
-            <th>Resultado</th>
-            <th>Plana</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyLog"></tbody>
-      </table>
-    </div>
+  <div id="controls">
+    <button id="modoBtn">Cambiar a Modo Práctica</button>
+    <button id="editBtn">Cambiar a Modo Edición</button>
   </div>
+
+  <div id="container">
+    <img id="planaImg" src="estomago.jpg" alt="Plana 1 – Hígado y Estómago">
+  </div>
+
+  <div id="infoBox">Modo Consulta: haz clic en un número para ver la estructura.</div>
 
   <script>
-    // --------- Datos por plana (sólo sus propios números) ----------
-    // ABDOMEN.jpg → Hígado (1–28)
-    const nombres_ABDOMEN = {
-      1:"Hígado",
-      2:"Hígado, área desnuda",
-      3:"Hígado, cara diafragmática",
-      4:"Hígado, cara visceral",
-      5:"Hígado, impresión del colon",
-      6:"Hígado, impresión del duodeno",
-      7:"Hígado, impresión del estómago",
-      8:"Hígado, impresión del esófago",
-      9:"Hígado, impresión del riñón",
-      10:"Hígado, lóbulo caudado",
-      11:"Hígado, lóbulo derecho",
-      12:"Hígado, lóbulo cuadrado",
-      13:"Hígado, lóbulo izquierdo",
-      14:"Hígado, borde inferior",
-      15:"Hígado, proceso caudado",
-      16:"Arteria hepática común",
-      17:"Conducto hepático derecho",
-      18:"Conducto hepático izquierdo",
-      19:"Vena cava inferior",
-      20:"Venas hepáticas",
-      21:"Ligamento redondo del hígado",
-      22:"Ligamento falciforme",
-      23:"Vesícula biliar, cuello",
-      24:"Vesícula biliar, cuerpo",
-      25:"Vesícula biliar, fondo",
-      26:"Conducto cístico",
-      27:"Conducto colédoco",
-      28:"Vena porta hepática"
-    };
+    let modo = "consulta";
+    let edicion = true;
+    let planaActual = "estomago";
 
-    // estomago.jpg → Estómago (1–15)
-    const nombres_ESTOMAGO = {
-      1:"Arteria gástrica derecha",
-      2:"Arteria gástrica izquierda",
-      3:"Arterias gástricas cortas",
-      4:"Arteria gastroepiploica derecha",
-      5:"Arteria gastroepiploica izquierda",
-      6:"Omento (epiplón) mayor",
-      7:"Estómago, curvatura mayor",
-      8:"Estómago, curvatura menor",
-      9:"Estómago, escotadura angular",
-      10:"Estómago, escotadura cardíaca",
-      11:"Estómago, cardias",
-      12:"Estómago, cuerpo",
-      13:"Estómago, fundus",
-      14:"Esófago, porción abdominal",
-      15:"Píloro"
-    };
-
-    // INTESTINOS.jpg → Intestino delgado y grueso (1–35)
-    const nombres_INTESTINOS = {
-      1:"Conducto pancreático",
-      2:"Colon ascendente",
-      3:"Colon descendente",
-      4:"Colon sigmoide",
-      5:"Colon transverso",
-      6:"Colon, haustra",
-      7:"Válvula del orificio ileocecal",
-      8:"Válvula ileocecal",
-      9:"Páncreas, cabeza",
-      10:"Páncreas, cola",
-      11:"Páncreas, cuerpo",
-      12:"Páncreas",
-      13:"Duodeno",
-      14:"Duodeno, ángulo inferior",
-      15:"Duodeno, ángulo superior",
-      16:"Duodeno, porción ascendente",
-      17:"Duodeno, porción descendente",
-      18:"Conducto colédoco",
-      19:"A. y v. esplénicas (lienales)",
-      20:"Apéndice vermiforme",
-      21:"Apéndice vermiforme, orificio",
-      22:"Ciego",
-      23:"Tenia libre",
-      24:"Íleon",
-      25:"Yeyuno",
-      26:"Conducto pancreático accesorio (Santorini)",
-      27:"A. y v. mesentéricas superiores",
-      28:"A. y v. mesentéricas inferiores",
-      29:"Aa. y Vv. yeyunales e íleales",
-      30:"A. y V. cólica derecha",
-      31:"A. y V. cólica media",
-      32:"A. y V. cólica izquierda",
-      33:"Aa. y Vv. sigmoideas",
-      34:"A. rectal superior",
-      35:"Mesocolon transverso"
-    };
-
-    // --------- Coordenadas iniciales aproximadas (en %) ----------
-    // Generadas como columnas izquierda/derecha distribuidas verticalmente; afínalas en Modo Edición.
-    function gridCoords(count, cols = 2){
-      const coords = [];
-      const rows = Math.ceil(count / cols);
-      for(let i=0;i<count;i++){
-        const r = i % rows;
-        const c = Math.floor(i / rows);
-        const top = 6 + (r * (88 / Math.max(rows-1,1))); // 6% a 94%
-        const left = c===0 ? 8 : (c===1 ? 92 : 50);
-        coords.push({top, left});
+    const estructuras = {
+      "estomago": {
+        1:"Hígado", 2:"Hígado, área desnuda", 3:"Hígado, cara diafragmática",
+        4:"Hígado, cara visceral", 5:"Hígado, impresión del colon",
+        6:"Hígado, impresión del duodeno", 7:"Hígado, impresión del estómago",
+        8:"Hígado, impresión del esófago", 9:"Hígado, impresión del riñón",
+        10:"Hígado, lóbulo caudado", 11:"Hígado, lóbulo derecho",
+        12:"Hígado, lóbulo cuadrado", 13:"Hígado, lóbulo izquierdo",
+        14:"Hígado, borde inferior", 15:"Hígado, proceso caudado",
+        16:"A. hepática común", 17:"Conducto hepático derecho",
+        18:"Conducto hepático izquierdo", 19:"V. cava inferior",
+        20:"Vv. hepáticas", 21:"Lig. redondo del hígado",
+        22:"Lig. falciforme", 23:"Vesícula biliar, cuello",
+        24:"Vesícula biliar, cuerpo", 25:"Vesícula biliar, fondo",
+        26:"Conducto cístico", 27:"Conducto colédoco",
+        28:"V. porta hepática",
+        a:"A. gástrica derecha", b:"Píloro"
+      },
+      "ABDOMEN": {
+        1:"Colon ascendente", 2:"Colon descendente", 3:"Colon sigmoide",
+        4:"Colon transverso", 5:"Colon, haustra", 6:"Colon, plica semilunar",
+        7:"Válvula del orificio ileocecal", 8:"Íleon", 9:"Yeyuno",
+        10:"Apéndice vermiforme", 11:"Apéndice vermiforme, orificio",
+        12:"Omento mayor", 13:"Válvula ileocecal", 14:"Tenia libre",
+        15:"Ángulo derecho del colon", 16:"Ángulo izquierdo del colon",
+        17:"Recto, ángulo sacro", 18:"Peritoneo visceral", 19:"Duodeno, ángulo inferior",
+        20:"Duodeno, ángulo superior", 21:"Duodeno, porción ascendente",
+        22:"Duodeno, porción descendente", 23:"Duodeno, porción horizontal",
+        24:"Páncreas, cabeza", 25:"Páncreas, cola", 26:"Páncreas, cuerpo",
+        27:"Conducto colédoco", 28:"A. y v. esplénicas", 29:"Conducto pancreático",
+        30:"Ciego"
+      },
+      "INTESTINOS": {
+        1:"Conducto pancreático", 2:"Colon ascendente", 3:"Colon descendente",
+        4:"Colon sigmoide", 5:"Colon transverso", 6:"Colon, haustra",
+        7:"Válvula del orificio ileocecal", 8:"Válvula ileocecal", 9:"Páncreas, cabeza",
+        10:"Páncreas, cola", 11:"Páncreas, cuerpo", 12:"Páncreas",
+        13:"Duodeno", 14:"Duodeno, ángulo inferior", 15:"Duodeno, ángulo superior",
+        16:"Duodeno, porción ascendente", 17:"Duodeno, porción descendente",
+        18:"Conducto colédoco", 19:"A. y v. esplénicas", 20:"Apéndice vermiforme",
+        21:"Apéndice vermiforme, orificio", 22:"Ciego", 23:"Tenia libre",
+        24:"Íleon", 25:"Yeyuno", 26:"Conducto pancreático accesorio (Santorini)",
+        27:"A. y v. mesentéricas superiores", 28:"A. y V. mesentérica inferior",
+        29:"Aa. y Vv. yeyunales e ileales", 30:"A. y V. cólica derecha",
+        31:"A. y V. cólica media", 32:"A. y V. cólica izquierda",
+        33:"Aa. y Vv. sigmoideas", 34:"A. rectal superior", 35:"Mesocolon transverso"
       }
-      return coords;
-    }
-    const coords_ABDOMEN   = gridCoords(28);
-    const coords_ESTOMAGO  = gridCoords(15);
-    const coords_INTESTINOS= gridCoords(35);
+    };
 
-    // --------- Estado / elementos UI ----------
-    const planaSel = document.getElementById('planaSel');
-    const img = document.getElementById('torso');
-    const imgWrap = document.getElementById('imgWrap');
-    const modeLabel = document.getElementById('modeLabel');
-    const tbodyLog = document.getElementById('tbodyLog');
-    let modo = 'edicion'; // 'edicion' | 'consulta' | 'practica'
-    let activos = [];      // hotspots activos
-    let draggingHS = null;
+    const container = document.getElementById("container");
+    const infoBox = document.getElementById("infoBox");
 
-    // Normalización para comparar
-    function norm(s){
-      return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .replace(/[.,;:]/g,' ').replace(/\s+/g,' ').trim();
-    }
-
-    // Obtiene mapa de nombres por plana
-    function getNombres(){
-      const src = planaSel.value;
-      if(src==='ABDOMEN.jpg')  return nombres_ABDOMEN;
-      if(src==='estomago.jpg') return nombres_ESTOMAGO;
-      return nombres_INTESTINOS;
-    }
-    function getCoords(){
-      const src = planaSel.value;
-      if(src==='ABDOMEN.jpg')  return coords_ABDOMEN;
-      if(src==='estomago.jpg') return coords_ESTOMAGO;
-      return coords_INTESTINOS;
-    }
-    function keyFor(num){ return `${planaSel.value}__${num}`; }
-
-    // Crea/recarga hotspots de la plana
-    function renderPlana(){
-      // limpiar anteriores
-      activos.forEach(h=>h.remove());
-      activos = [];
-      // set imagen
-      img.src = planaSel.value;
-      img.alt = planaSel.options[planaSel.selectedIndex].text;
-
-      const nombres = getNombres();
-      const coords  = getCoords();
-
-      // construir
-      const nums = Object.keys(nombres).map(n=>parseInt(n,10)).sort((a,b)=>a-b);
-      nums.forEach((num, idx)=>{
-        const hs = document.createElement('div');
-        hs.className = 'hotspot';
-        hs.dataset.num = String(num);
-        hs.textContent = num;
-
-        // posición guardada o aproximada
-        const saved = JSON.parse(localStorage.getItem(keyFor(num)) || 'null');
-        const pos = saved || coords[idx] || {top: 10 + idx*2, left: (idx%2?92:8)};
-        setHSPosition(hs, pos.top, pos.left);
-
-        // visibilidad según modo
-        applyVisibility(hs);
-
-        // eventos
-        hs.addEventListener('mousedown', e=>{
-          if(modo!=='edicion') return;
-          draggingHS = {el:hs, startX:e.clientX, startY:e.clientY};
-          e.preventDefault();
-        });
-        hs.addEventListener('click', ()=>{
-          const correcto = nombres[num];
-          if(modo==='consulta'){
-            info(`${num}: ${correcto}`);
-          }else if(modo==='practica'){
-            const r = prompt(`Introduce el nombre para el número ${num}:`);
-            if(r==null) return;
-            const ok = norm(r)===norm(correcto);
-            pushLog(num, r, correcto, ok, planaSel.value);
-            alert(ok ? `✅ Correcto (${correcto})` : `❌ Incorrecto. Correcto: ${correcto}`);
+    // Generar puntos iniciales
+    function generarHotspots() {
+      container.querySelectorAll(".hotspot").forEach(e => e.remove());
+      const lista = estructuras[planaActual];
+      for (let n in lista) {
+        const hs = document.createElement("div");
+        hs.className = "hotspot";
+        hs.dataset.numero = n;
+        hs.textContent = n;
+        hs.style.top = Math.random() * 90 + "%";
+        hs.style.left = Math.random() * 90 + "%";
+        if (!edicion) hs.classList.add("hidden");
+        hs.addEventListener("click", () => {
+          if (edicion) return;
+          const nombre = lista[n] || "No asignado";
+          if (modo === "consulta") {
+            infoBox.innerText = `${n}: ${nombre}`;
+          } else {
+            const r = prompt(`Introduce el nombre para el número ${n}:`);
+            if (r) {
+              if (normalizar(r) === normalizar(nombre))
+                alert(`✅ Correcto: ${nombre}`);
+              else alert(`❌ Incorrecto. Correcto: ${nombre}`);
+            }
           }
         });
-
-        imgWrap.appendChild(hs);
-        activos.push(hs);
-      });
-    }
-
-    function setHSPosition(hs, topPct, leftPct){
-      hs.style.top  = `${topPct}%`;
-      hs.style.left = `${leftPct}%`;
-    }
-
-    // drag & drop en edición
-    document.addEventListener('mousemove', e=>{
-      if(!draggingHS) return;
-      const rect = img.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top)  / rect.height)* 100;
-      setHSPosition(draggingHS.el, Math.max(0,Math.min(100,y)), Math.max(0,Math.min(100,x)));
-    });
-    document.addEventListener('mouseup', ()=>{
-      if(!draggingHS) return;
-      const hs = draggingHS.el;
-      draggingHS = null;
-      // guardar
-      const num = hs.dataset.num;
-      localStorage.setItem(keyFor(num), JSON.stringify({
-        top: parseFloat(hs.style.top),
-        left: parseFloat(hs.style.left)
-      }));
-    });
-
-    // modos
-    function setModo(m){
-      modo = m;
-      modeLabel.textContent = (m==='edicion'?'Edición':(m==='consulta'?'Consulta':'Práctica'));
-      activos.forEach(applyVisibility);
-      info(`Modo: ${modeLabel.textContent}. ${m==='edicion' ? 'Arrastra para ubicar y se guarda solo.' : 'Los puntos están invisibles; haz clic para interactuar.'}`);
-    }
-    function applyVisibility(hs){
-      if(modo==='edicion'){
-        hs.classList.remove('invisible');
-      }else{
-        hs.classList.add('invisible'); // invisibles pero siguen clickeables
+        hs.addEventListener("mousedown", e => {
+          if (!edicion) return;
+          const rect = container.getBoundingClientRect();
+          function move(ev) {
+            const x = (ev.clientX - rect.left) / rect.width * 100;
+            const y = (ev.clientY - rect.top) / rect.height * 100;
+            hs.style.left = x + "%";
+            hs.style.top = y + "%";
+          }
+          function up() {
+            document.removeEventListener("mousemove", move);
+            document.removeEventListener("mouseup", up);
+          }
+          document.addEventListener("mousemove", move);
+          document.addEventListener("mouseup", up);
+        });
+        container.appendChild(hs);
       }
     }
 
-    // info/log
-    function info(text){ document.getElementById('infoBox').textContent = text; }
-    function pushLog(num, resp, corr, ok, plana){
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${num}</strong></td>
-        <td>${resp||'<span class="muted">—</span>'}</td>
-        <td>${corr}</td>
-        <td>${ok?'<span class="tag ok">Correcto</span>':'<span class="tag bad">Incorrecto</span>'}</td>
-        <td class="muted">${plana}</td>
-      `;
-      tbodyLog.prepend(tr);
+    // Normalizar texto
+    function normalizar(txt) {
+      return txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\.,;:]/g, "");
     }
 
-    // export/import
-    document.getElementById('exportBtn').addEventListener('click', ()=>{
-      const nombres = getNombres();
-      const out = {plana:planaSel.value, posiciones:{}};
-      Object.keys(nombres).forEach(n=>{
-        const hs = activos.find(h=>h.dataset.num===String(n));
-        if(!hs) return;
-        out.posiciones[n] = {top: parseFloat(hs.style.top), left: parseFloat(hs.style.left)};
+    // Cambiar modo
+    document.getElementById("modoBtn").onclick = () => {
+      modo = (modo === "consulta") ? "practica" : "consulta";
+      infoBox.innerText = (modo === "consulta")
+        ? "Modo Consulta: haz clic en un número para ver la estructura."
+        : "Modo Práctica: haz clic en un número e ingresa la respuesta.";
+    };
+
+    // Cambiar edición
+    document.getElementById("editBtn").onclick = () => {
+      edicion = !edicion;
+      document.querySelectorAll(".hotspot").forEach(h => {
+        if (edicion) h.classList.remove("hidden");
+        else h.classList.add("hidden");
       });
-      const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${planaSel.value.replace(/\.[a-z]+$/i,'')}_posiciones.json`;
-      a.click(); URL.revokeObjectURL(url);
+    };
+
+    // Cambiar plana
+    document.querySelectorAll("#menu button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#menu button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        planaActual = btn.dataset.plana;
+        document.getElementById("planaImg").src = planaActual + ".jpg";
+        generarHotspots();
+      });
     });
 
-    document.getElementById('importFile').addEventListener('change', e=>{
-      const file = e.target.files[0]; if(!file) return;
-      const fr = new FileReader();
-      fr.onload = ()=>{
-        try{
-          const data = JSON.parse(fr.result);
-          if(!data || data.plana!==planaSel.value || !data.posiciones) throw new Error('Archivo incompatible con la plana actual.');
-          Object.entries(data.posiciones).forEach(([n, pos])=>{
-            localStorage.setItem(`${planaSel.value}__${n}`, JSON.stringify(pos));
-          });
-          renderPlana();
-          alert('✅ Posiciones importadas.');
-        }catch(err){
-          alert('❌ Error al importar: ' + err.message);
-        }
-      };
-      fr.readAsText(file);
-      e.target.value = '';
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-      if(!confirm('¿Borrar posiciones guardadas de la plana actual?')) return;
-      const nombres = getNombres();
-      Object.keys(nombres).forEach(n=> localStorage.removeItem(`${planaSel.value}__${n}`));
-      renderPlana();
-      alert('🔄 Posiciones locales reiniciadas para esta plana.');
-    });
-
-    // listeners UI
-    document.getElementById('modoEdicion').addEventListener('click', ()=> setModo('edicion'));
-    document.getElementById('modoConsulta').addEventListener('click', ()=> setModo('consulta'));
-    document.getElementById('modoPractica').addEventListener('click', ()=> setModo('practica'));
-    planaSel.addEventListener('change', ()=> renderPlana());
-
-    // init
-    renderPlana();
-    setModo('edicion');
+    generarHotspots();
   </script>
 </body>
 </html>
